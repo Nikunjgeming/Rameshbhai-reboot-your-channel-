@@ -1,0 +1,18 @@
+{
+  "name": "netlify-otp-website",
+  "version": "1.0.0",
+  "description": "OTP Buying Website - Netlify Deployment",
+  "main": "index.html",
+  "scripts": {
+    "build": "echo 'Build complete'",
+    "dev": "netlify dev"
+  },
+  "dependencies": {
+    "node-fetch": "^2.6.7",
+    "uuid": "^9.0.0",
+    "bcryptjs": "^2.4.3"
+  },
+  "devDependencies": {
+    "@netlify/functions": "^1.6.0"
+  }
+}

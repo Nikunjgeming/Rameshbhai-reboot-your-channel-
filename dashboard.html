@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - CHEAP OTP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+        }
+
+        .logo span {
+            background: linear-gradient(135deg, #FF6B6B, #4ECDC4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .balance-card {
+            background: linear-gradient(135deg, #FF6B6B, #4ECDC4);
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-weight: 600;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-card i {
+            font-size: 32px;
+            color: #4ECDC4;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .search-box {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            padding: 12px 20px;
+            margin: 20px 0;
+        }
+
+        .search-box input {
+            background: none;
+            border: none;
+            outline: none;
+            color: white;
+            width: 100%;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .service-card {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .service-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border-radius: 20px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4ECDC4, #FF6B6B);
+            color: white;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 12px 20px;
+            border-radius: 10px;
+            display: none;
+            z-index: 3000;
+        }
+
+        .support-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #0088cc;
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 28px;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <div class="logo">
+                    <i class="fas fa-shield-alt"></i> <span>CHEAP OTP</span>
+                </div>
+                <div class="balance-card">
+                    <i class="fas fa-wallet"></i> Balance: ₹<span id="balance">0</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-card" onclick="showOrders()">
+                <i class="fas fa-shopping-cart"></i>
+                <div class="stat-value" id="totalOrders">0</div>
+                <div>Total Orders</div>
+            </div>
+            <div class="stat-card" onclick="showDepositModal()">
+                <i class="fas fa-plus-circle"></i>
+                <div class="stat-value">Add Funds</div>
+                <div>Click to Deposit</div>
+            </div>
+        </div>
+
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="Search services...">
+        </div>
+
+        <h2>Popular Services</h2>
+        <div class="services-grid" id="servicesGrid">
+            <div style="text-align:center; padding:40px;">Loading services...</div>
+        </div>
+    </div>
+
+    <!-- Deposit Modal -->
+    <div id="depositModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add Balance</h3>
+                <button onclick="closeDepositModal()" style="background:none; border:none; color:white; font-size:24px; cursor:pointer;">&times;</button>
+            </div>
+            <div style="padding: 20px;">
+                <div style="text-align:center; margin-bottom:20px;">
+                    <img src="https://graph.org/file/f3532cf9f2378308d9f96-941cb7104eeea3af2b.jpg" alt="QR Code" style="max-width:200px; border-radius:16px;" onerror="this.src='https://via.placeholder.com/200?text=QR+Code'">
+                </div>
+                <div style="background:rgba(255,255,255,0.1); padding:15px; border-radius:12px; text-align:center; margin-bottom:20px;">
+                    <i class="fas fa-credit-card"></i> UPI ID: <strong>solanki.165@superyes</strong>
+                    <button onclick="copyUPI()" style="margin-left:10px; padding:5px 10px; background:#4ECDC4; border:none; border-radius:5px; cursor:pointer;">Copy</button>
+                </div>
+                <input type="number" id="depositAmount" placeholder="Amount (₹)" style="width:100%; padding:12px; border-radius:8px; border:none; margin-bottom:10px;">
+                <input type="text" id="transactionId" placeholder="Transaction ID" style="width:100%; padding:12px; border-radius:8px; border:none; margin-bottom:20px;">
+                <button class="btn btn-primary" style="width:100%;" onclick="submitDeposit()">Submit Request</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Support Button -->
+    <div class="support-btn" onclick="window.open('https://t.me/NikunjBro', '_blank')">
+        <i class="fab fa-telegram"></i>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        let currentUser = null;
+        let allServices = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuth();
+            loadServices();
+            loadBalance();
+            loadUserStats();
+        });
+
+        function checkAuth() {
+            const user = localStorage.getItem('user');
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+            currentUser = JSON.parse(user);
+        }
+
+        async function loadServices() {
+            try {
+                const response = await fetch('/api/?action=getAllServices');
+                const data = await response.json();
+                if (data.success) {
+                    allServices = data.services;
+                    displayServices(allServices);
+                }
+            } catch (error) {
+                console.error('Error loading services:', error);
+                loadMockServices();
+            }
+        }
+
+        function loadMockServices() {
+            allServices = [
+                { code: 'tg', name: 'Telegram', price: 18.50, available: 999, icon: 'fab fa-telegram' },
+                { code: 'wa', name: 'WhatsApp', price: 25.00, available: 850, icon: 'fab fa-whatsapp' },
+                { code: 'gp', name: 'Google', price: 15.00, available: 2000, icon: 'fab fa-google' },
+                { code: 'fb', name: 'Facebook', price: 20.00, available: 750, icon: 'fab fa-facebook' }
+            ];
+            displayServices(allServices);
+        }
+
+        function displayServices(services) {
+            const grid = document.getElementById('servicesGrid');
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = services.filter(s => s.name.toLowerCase().includes(searchTerm));
+            
+            if (filtered.length === 0) {
+                grid.innerHTML = '<div style="text-align:center; padding:40px;">No services found</div>';
+                return;
+            }
+            
+            grid.innerHTML = filtered.map(service => `
+                <div class="service-card" onclick="buyService('${service.code}', ${service.price})">
+                    <div style="display:flex; justify-content:space-between;">
+                        <div><i class="${service.icon}"></i> ${service.name}</div>
+                        <div style="color:#4ECDC4; font-weight:700;">₹${service.price}</div>
+                    </div>
+                    <div style="font-size:12px; color:rgba(255,255,255,0.6); margin-top:10px;">
+                        <i class="fas fa-check-circle"></i> ${service.999}+ available
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        document.getElementById('searchInput').addEventListener('keyup', () => displayServices(allServices));
+
+        async function buyService(serviceCode, price) {
+            if (parseFloat(currentUser.balance) < price) {
+                showToast('Insufficient balance! Please add funds.', 'error');
+                showDepositModal();
+                return;
+            }
+            
+            showToast('Buying number...', 'info');
+            
+            try {
+                const response = await fetch('/api/?action=buyNumber', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        service: serviceCode, 
+                        userId: currentUser.id,
+                        country: '91'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showToast(`Number purchased: ${data.number}`, 'success');
+                    currentUser.balance = parseFloat(currentUser.balance) - price;
+                    localStorage.setItem('user', JSON.stringify(currentUser));
+                    document.getElementById('balance').innerText = currentUser.balance;
+                    
+                    // Start OTP check
+                    startOTPCheck(data.activation_id);
+                } else {
+                    showToast(data.error || 'Purchase failed', 'error');
+                }
+            } catch (error) {
+                showToast('Network error', 'error');
+            }
+        }
+
+        async function loadBalance() {
+            try {
+                const response = await fetch('/api/?action=getBalance');
+                const data = await response.json();
+                if (data.success) {
+                    document.getElementById('balance').innerText = data.balance;
+                }
+            } catch (error) {
+                document.getElementById('balance').innerText = '0';
+            }
+        }
+
+        async function loadUserStats() {
+            // For demo - show mock stats
+            document.getElementById('totalOrders').innerText = '0';
+        }
+
+        function showDepositModal() {
+            document.getElementById('depositModal').style.display = 'flex';
+        }
+
+        function closeDepositModal() {
+            document.getElementById('depositModal').style.display = 'none';
+        }
+
+        function copyUPI() {
+            navigator.clipboard.writeText('solanki.165@superyes');
+            showToast('UPI ID copied!', 'success');
+        }
+
+        async function submitDeposit() {
+            const amount = document.getElementById('depositAmount').value;
+            const transactionId = document.getElementById('transactionId').value;
+            
+            if (!amount || !transactionId) {
+                showToast('Please fill all fields', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/?action=requestDeposit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userId: currentUser.id,
+                        amount: amount,
+                        transactionId: transactionId
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showToast('Deposit request submitted! Awaiting approval.', 'success');
+                    closeDepositModal();
+                    document.getElementById('depositAmount').value = '';
+                    document.getElementById('transactionId').value = '';
+                } else {
+                    showToast(data.error || 'Submission failed', 'error');
+                }
+            } catch (error) {
+                showToast('Network error', 'error');
+            }
+        }
+
+        function startOTPCheck(activationId) {
+            let attempts = 0;
+            const interval = setInterval(async () => {
+                attempts++;
+                try {
+                    const response = await fetch(`/api/?action=checkOTP&id=${activationId}`);
+                    const data = await response.json();
+                    
+                    if (data.success && data.code) {
+                        clearInterval(interval);
+                        showToast(`✅ OTP Received: ${data.code}`, 'success');
+                    } else if (attempts >= 12) {
+                        clearInterval(interval);
+                        showToast('OTP timeout. Please check manually.', 'warning');
+                    }
+                } catch (error) {
+                    console.error('Error checking OTP:', error);
+                }
+            }, 5000);
+        }
+
+        function showOrders() {
+            alert('Orders feature coming soon!');
+        }
+
+        function showToast(message, type) {
+            const toast = document.getElementById('toast');
+            toast.innerHTML = message;
+            toast.style.display = 'block';
+            setTimeout(() => toast.style.display = 'none', 3000);
+        }
+    </script>
+</body>
+</html>
